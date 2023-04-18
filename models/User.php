@@ -24,7 +24,7 @@ class User
 
     }
 
-    public static function insertUser()
+    public static function showUsers()
     {
 
     }
