@@ -1,7 +1,5 @@
 <?php
 
-use core\DB;
-
 include("config/database.php");
 
 spl_autoload_register(function ($className) {
@@ -10,16 +8,11 @@ spl_autoload_register(function ($className) {
         require($path);
 });
 
-$db = new DB(
-    DATABASE_HOST,
-    DATABASE_LOGIN,
-    DATABASE_PASSWORD,
-    DATABASE_BASENAME
-);
-$db->select("product");
-
-/*
 $core = core\Core::getInstance();
+
 $core->Initialize();
+
+// \Models\User::addUser("123", "123", "123", "123");
+
 $core->Run();
-$core->Done();*/
+$core->Done();

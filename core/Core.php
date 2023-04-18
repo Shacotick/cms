@@ -8,6 +8,7 @@ class Core
 {
     private static $instance = null;
     public $app;
+    public $db;
 
     private function __construct()
     {
@@ -24,6 +25,12 @@ class Core
 
     public function Initialize()
     {
+        $this->db = new DB(
+            DATABASE_HOST,
+            DATABASE_LOGIN,
+            DATABASE_PASSWORD,
+            DATABASE_BASENAME
+        );
     }
 
     public function Run()
