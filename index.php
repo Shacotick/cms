@@ -23,3 +23,5 @@ $core = core\Core::getInstance();
 $core->Initialize();
 $core->Run();
 $core->Done();*/
+
+#die;
