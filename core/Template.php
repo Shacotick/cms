@@ -2,27 +2,71 @@
 
 namespace core;
 
+/**
+ * [Description Template]
+ */
 class Template
 { 
+    /**
+     * [Description for $path]
+     *
+     * @var [type]
+     */
     protected $path;
+
+    /**
+     * [Description for $params]
+     *
+     * @var [type]
+     */
     protected $params;
+
+    /**
+     * [Description for __construct]
+     *
+     * @param mixed $path
+     * 
+     */
     public function __construct($path)
     {
         $this->path = $path;
         $this->params = [];
     }
 
+    /**
+     * [Description for setParam]
+     *
+     * @param mixed $name
+     * @param mixed $value
+     * 
+     * @return [type]
+     * 
+     */
     public function setParam($name, $value)
     {
         $this->params[$name] = $value;
     }
 
+    /**
+     * [Description for setParams]
+     *
+     * @param mixed $params
+     * 
+     * @return [type]
+     * 
+     */
     public function setParams($params)
     {
         foreach($params as $name => $value)
             $this->setParam($name, $value);
     }
 
+    /**
+     * [Description for getHTML]
+     *
+     * @return [type]
+     * 
+     */
     public function getHTML()
     {
         ob_start();                 // закидаємо весь хтмл код в буфер

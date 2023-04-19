@@ -3,9 +3,29 @@
 namespace Models;
 use core\Core;
 
+/**
+ * [Description User]
+ */
 class User
 {
+    /**
+     * [Description for $tableName]
+     *
+     * @var string
+     */
     protected static $tableName = "user";
+
+    /**
+     * [Description for addUser]
+     *
+     * @param mixed $login
+     * @param mixed $password
+     * @param mixed $lastname
+     * @param mixed $firstname
+     * 
+     * @return [type]
+     * 
+     */
     public static function addUser($login, $password, $lastname, $firstname)
     {
         \core\Core::getInstance()->db->insert(

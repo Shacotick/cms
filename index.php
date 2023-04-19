@@ -1,15 +1,17 @@
 <?php
 
+// підключення файлу з конфігами
 include("config/database.php");
 
+// автозагрузка кожної сторінки
 spl_autoload_register(function ($className) {
     $path = $className . '.php';
     if (is_file($path))
         require($path);
 });
 
-$core = core\Core::getInstance();
 
+$core = core\Core::getInstance();
 $core->Initialize();
 
 // \Models\User::addUser("123", "123", "123", "123");

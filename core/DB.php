@@ -2,16 +2,41 @@
 
 namespace core;
 
-use PDO;
-
+/**
+ * Клас для виконання запитів до БД
+ */
 class DB
 {
+    /**
+     * [Description for $pdo]
+     *
+     * @var [type]
+     */
     protected $pdo;
+
+    /**
+     * [Description for __construct]
+     *
+     * @param mixed $hostname
+     * @param mixed $login
+     * @param mixed $password
+     * @param mixed $database
+     * 
+     */
     public function __construct($hostname, $login, $password, $database)
     {
         $this->pdo = new \PDO("mysql: host={$hostname}; dbname={$database}", $login, $password);
     }
 
+
+    /**
+     * [Description for __construct]
+     *
+     * @param mixed $tableName
+     * @param mixed $fieldsList
+     * @param mixed $conditionArray
+     * 
+     */
     public function select($tableName, $fieldsList = "*", $conditionArray = null)
     {
         if (is_array($fieldsList))
@@ -31,6 +56,17 @@ class DB
         return $res->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+
+    /**
+     * [Description for update]
+     *
+     * @param mixed $tableName
+     * @param mixed $newValuesArray
+     * @param mixed $conditionArray
+     * 
+     * @return [type]
+     * 
+     */
     public function update($tableName, $newValuesArray, $conditionArray)
     {
         $paramsArray = [];
@@ -55,6 +91,15 @@ class DB
         $res->execute($paramsArray);
     }
 
+    /**
+     * [Description for insert]
+     *
+     * @param mixed $tableName
+     * @param mixed $newRowArray
+     * 
+     * @return [type]
+     * 
+     */
     public function insert($tableName, $newRowArray)
     {
         $fieldsArray = array_keys($newRowArray);
@@ -69,6 +114,15 @@ class DB
         $res->execute($newRowArray);
     }
 
+    /**
+     * [Description for delete]
+     *
+     * @param mixed $tableName
+     * @param mixed $conditionArray
+     * 
+     * @return [type]
+     * 
+     */
     public function delete($tableName, $conditionArray)
     {
         $whereParts = [];

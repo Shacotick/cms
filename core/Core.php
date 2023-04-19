@@ -4,17 +4,47 @@ namespace core;
 
 use controllers\MainController;
 
+/**
+ * Ядро системи
+ */
 class Core
 {
+    /**
+     * Змінна, яка містить саме ядро системи
+     *
+     * @var null
+     */
     private static $instance = null;
-    public $app;
-    public $db;
 
+    /**
+     * Асоціативний масив для збереження основних данних ядра системи
+     *
+     * @var [type]
+     */
+    public $app;
+
+    /**
+     * Об'єкт класу бази данних
+     *
+     * @var [type]
+     */
+    public DB $db;
+
+    /**
+     * Конструктор класу, який ініціалізує масив app[]
+     *
+     */
     private function __construct()
     {
         $this->app = [];
     }
 
+    /**
+     * Метод, що повертає ядро системи. Всі операції з ядром системи проводяться через цей метод
+     *
+     * @return [type]
+     * 
+     */
     public static function getInstance()
     {
         if (empty(self::$instance)) {
@@ -23,6 +53,12 @@ class Core
         return self::$instance;
     }
 
+    /**
+     * Метод для ініціалізації бази даних
+     *
+     * @return [type]
+     * 
+     */
     public function Initialize()
     {
         $this->db = new DB(
@@ -33,6 +69,13 @@ class Core
         );
     }
 
+    /**
+     * Запуск системи. Формується адресна строка та перевіряється чи існує певний клас і метод в системі, 
+     * що був введений в адресну строку
+     * 
+     * @return [type]
+     * 
+     */
     public function Run()
     {
         $route = $_GET['route'];
@@ -70,6 +113,12 @@ class Core
         }
     }
 
+    /**
+     * 
+     *
+     * @return [type]
+     * 
+     */
     public function Done()
     {
         $pathToLayout = "themes/light/layout.php";
