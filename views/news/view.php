@@ -1,1 +1,0 @@
-<h1> View News </h1>

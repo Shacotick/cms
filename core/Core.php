@@ -24,11 +24,25 @@ class Core
     public $app;
 
     /**
+     * Параметри кожної сторінки
+     *
+     * @var [type]
+     */
+    public $pageParams;
+
+    /**
      * Об'єкт класу бази данних
      *
      * @var [type]
      */
-    public DB $db;
+    public $db;
+
+    /**
+     * [requestMethod від супермасиву REQUEST]
+     *
+     * @var [type]
+     */
+    public $requestMethod;
 
     /**
      * Конструктор класу, який ініціалізує масив app[]
@@ -36,7 +50,9 @@ class Core
      */
     private function __construct()
     {
+        global $pageParams;
         $this->app = [];
+        $this->pageParams = $pageParams;
     }
 
     /**
@@ -54,19 +70,22 @@ class Core
     }
 
     /**
-     * Метод для ініціалізації бази даних
+     * Метод для ініціалізації даних
      *
      * @return [type]
      * 
      */
     public function Initialize()
     {
+        session_start();
         $this->db = new DB(
             DATABASE_HOST,
             DATABASE_LOGIN,
             DATABASE_PASSWORD,
             DATABASE_BASENAME
         );
+
+        $this->requestMethod = $_SERVER['REQUEST_METHOD'];
     }
 
     /**
@@ -83,6 +102,7 @@ class Core
 
         $moduleName = strtolower(array_shift($routeParts));
         $actionName = strtolower(array_shift($routeParts));
+
         if (empty($moduleName))
             $moduleName = "main";
         if (empty($actionName))
@@ -90,6 +110,7 @@ class Core
 
         $this->app["moduleName"] = $moduleName;
         $this->app["actionName"] = $actionName;
+        $this->app["routeParts"] = $routeParts;
 
         $contollerName = '\\controllers\\' . ucfirst($moduleName) . 'Controller';
         $contollerActionName = $actionName . 'Action';
@@ -98,7 +119,17 @@ class Core
         if (class_exists($contollerName)) {
             $controller = new $contollerName();
             if (method_exists($controller, $contollerActionName))
-                $this->app["actionResult"] = $controller->$contollerActionName();
+            {
+                $actionResult = $controller->$contollerActionName($routeParts);
+                if($actionResult instanceof Error)
+                    $statusCode = $actionResult->code;   
+                $this->pageParams['content'] = $actionResult;
+                
+                if($this->app['moduleName'] === "projects" && $this->app['actionName'] === "view")
+                    $this->pageParams['isConstructor'] = true;
+                else
+                    $this->pageParams['isConstructor'] = false;
+            }
             else {
                 $statusCode = 404;
             }
@@ -109,12 +140,12 @@ class Core
         $statusCodeType = intval($statusCode / 100);
         if ($statusCodeType == 4 || $statusCodeType == 5) {
             $mainController = new MainController();
-            $mainController->errorAction($statusCode);
+            $this->pageParams["content"] = $mainController->errorAction($statusCode);
         }
     }
 
     /**
-     * 
+     * Метод підгружає теми. Основна тема знаходиться за шляхом themes/light/layout.php
      *
      * @return [type]
      * 
@@ -123,7 +154,7 @@ class Core
     {
         $pathToLayout = "themes/light/layout.php";
         $tpl = new Template($pathToLayout);
-        $tpl->setParam("content", $this->app["actionResult"]);
+        $tpl->setParams($this->pageParams);
         $html = $tpl->getHTML();
         echo $html;
     }

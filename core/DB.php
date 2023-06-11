@@ -8,39 +8,67 @@ namespace core;
 class DB
 {
     /**
-     * [Description for $pdo]
+     * Об'єкт класу PDO, для роботи з БД
      *
      * @var [type]
      */
     protected $pdo;
 
     /**
-     * [Description for __construct]
+     * Конструктор класу утворює з'єднання з БД
      *
      * @param mixed $hostname
      * @param mixed $login
      * @param mixed $password
      * @param mixed $database
-     * 
+     *
      */
     public function __construct($hostname, $login, $password, $database)
     {
-        $this->pdo = new \PDO("mysql: host={$hostname}; dbname={$database}", $login, $password);
+        $this->pdo = new \PDO ("mysql: host={$hostname}; dbname={$database}", $login, $password);
     }
 
+    /*public function select($tableName, $fieldsList = "*", $conditionArray = null)
+    {
+    if (is_array($fieldsList))
+    $fieldsList = implode(", ", $fieldsList);
+
+    $wherePart = "";
+    if (is_array($conditionArray)) {
+    $parts = [];
+    foreach ($conditionArray as $key => $value) {
+    $parts[] = "{$key} = :{$key}";
+    }
+    $wherePart = "WHERE " . implode(" AND ", $parts);
+    }
+    $res = $this->pdo->prepare("SELECT {$fieldsList} FROM {$tableName} {$wherePart}");
+    $res->execute($conditionArray);
+
+    return $res->fetchAll(\PDO::FETCH_ASSOC);
+    }*/
 
     /**
-     * [Description for __construct]
+     * Виконує вибірку рядків з вказаної таблиці
      *
-     * @param mixed $tableName
-     * @param mixed $fieldsList
-     * @param mixed $conditionArray
-     * 
+     * @param string $tableName
+     * @param string|array $fieldsList
+     * @param array|null $conditionArray
+     *
      */
-    public function select($tableName, $fieldsList = "*", $conditionArray = null)
+    public function select($tableName, $fieldsList = "*", $conditionArray = null, $joinTables = null, $joinCondition = null)
     {
-        if (is_array($fieldsList))
+        if (is_array($fieldsList)) {
             $fieldsList = implode(", ", $fieldsList);
+        }
+
+        $joinPart = "";
+        if (is_array($joinTables) && is_array($joinCondition)) {
+            $joinParts = [];
+            foreach ($joinTables as $key => $table) {
+                $joinParts[] = "JOIN {$table} ON {$joinCondition[$key]}";
+            }
+            $joinPart = implode(" ", $joinParts);
+        }
 
         $wherePart = "";
         if (is_array($conditionArray)) {
@@ -50,90 +78,105 @@ class DB
             }
             $wherePart = "WHERE " . implode(" AND ", $parts);
         }
-        $res = $this->pdo->prepare("SELECT {$fieldsList} FROM {$tableName} {$wherePart}");
+
+        $query = "SELECT {$fieldsList} FROM {$tableName} {$joinPart} {$wherePart}";
+        $res = $this->pdo->prepare($query);
         $res->execute($conditionArray);
 
         return $res->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-
     /**
-     * [Description for update]
+     * Оновлює інформацію певного рядка в вказаній таблиці
      *
-     * @param mixed $tableName
-     * @param mixed $newValuesArray
-     * @param mixed $conditionArray
-     * 
+     * @param string $tableName
+     * @param array $newValuesArray
+     * @param array $conditionArray
+     *
      * @return [type]
-     * 
+     *
      */
     public function update($tableName, $newValuesArray, $conditionArray)
     {
         $paramsArray = [];
 
         $setParts = [];
-        foreach ($newValuesArray as $key => $value)
-        {
+        foreach ($newValuesArray as $key => $value) {
             $setParts[] = "{$key} = :set{$key}";
             $paramsArray["set" . $key] = $value;
         }
         $setPartString = implode(", ", $setParts);
 
         $whereParts = [];
-        foreach ($conditionArray as $key => $value)
-        {
-            $whereParts[] = "{$key} = :{$key}";  
+        foreach ($conditionArray as $key => $value) {
+            $whereParts[] = "{$key} = :{$key}";
             $paramsArray[$key] = $value;
         }
         $wherePartString = "WHERE " . implode(" AND ", $whereParts);
 
         $res = $this->pdo->prepare("UPDATE {$tableName} SET {$setPartString} {$wherePartString}");
-        $res->execute($paramsArray);
+        $success = $res->execute($paramsArray);
+
+        return $success;
     }
 
     /**
-     * [Description for insert]
+     * Добавляє новий рядок у вказану таблицю
      *
-     * @param mixed $tableName
-     * @param mixed $newRowArray
-     * 
+     * @param string $tableName
+     * @param array $newRowArray
+     *
      * @return [type]
-     * 
+     *
      */
     public function insert($tableName, $newRowArray)
     {
         $fieldsArray = array_keys($newRowArray);
         $fieldsListString = implode(", ", $fieldsArray);
-        
+
         $paramsArray = [];
-        foreach($newRowArray as $key => $value)
+        foreach ($newRowArray as $key => $value) {
             $paramsArray[] = ":" . $key;
-        
+        }
+
         $valuesListString = implode(", ", $paramsArray);
         $res = $this->pdo->prepare("INSERT INTO {$tableName} ($fieldsListString) VALUES ($valuesListString)");
-        $res->execute($newRowArray);
+        $success = $res->execute($newRowArray);
+
+        return $success;
     }
 
     /**
-     * [Description for delete]
+     * Видаляє рядок з вказаної таблиці
      *
-     * @param mixed $tableName
-     * @param mixed $conditionArray
-     * 
+     * @param string $tableName
+     * @param array $conditionArray
+     *
      * @return [type]
-     * 
+     *
      */
     public function delete($tableName, $conditionArray)
     {
         $whereParts = [];
-        foreach ($conditionArray as $key => $value)
-        {
-            $whereParts[] = "{$key} = :{$key}";  
+        foreach ($conditionArray as $key => $value) {
+            $whereParts[] = "{$key} = :{$key}";
             $paramsArray[$key] = $value;
         }
         $wherePartString = "WHERE " . implode(" AND ", $whereParts);
 
         $res = $this->pdo->prepare("DELETE FROM {$tableName} {$wherePartString}");
-        $res->execute($conditionArray);
+        $success = $res->execute($conditionArray);
+
+        return $success;
+    }
+
+    public function selectLastAddedItem($tableName)
+    {
+        $statement = $this->pdo->prepare(
+            "SELECT * FROM $tableName ORDER BY id DESC LIMIT 1"
+        );
+        $statement->execute();
+
+        return $statement->fetch(\PDO::FETCH_ASSOC);
     }
 }

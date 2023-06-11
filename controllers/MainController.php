@@ -2,24 +2,26 @@
 
 namespace controllers;
 
+use core\Controller;
+
 /**
- * [Description MainController]
+ * Контроллер основної сторінки сайту
  */
-class MainController
+class MainController extends Controller
 {
     /**
-     * [Description for indexAction]
+     * Метод index
      *
      * @return [type]
      * 
      */
     public function indexAction()
     {
-        echo "Main Page";
+        return $this->render();
     }
 
     /**
-     * [Description for errorAction]
+     * Метод викликає помилку у разі її виникнення
      *
      * @param mixed $code
      * 
@@ -31,7 +33,10 @@ class MainController
         switch($code)
         {
             case 404:
-                echo "Error 404. Not Found.";
+                return $this->render("views/main/error-404.php");
+                break;
+            case 403:
+                return $this->render("views/main/error-403.php");
                 break;
         }
     }

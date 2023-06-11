@@ -8,21 +8,22 @@ namespace core;
 class Template
 { 
     /**
-     * [Description for $path]
+     * Шлях до шаблону сторінки
      *
      * @var [type]
      */
     protected $path;
 
     /**
-     * [Description for $params]
+     * Асоціативний масив параметрів, які потенційно можуть використовуватись в сторінці.
+     * Наприклад, cms/user/index/2, де 2 - параметр
      *
      * @var [type]
      */
     protected $params;
 
     /**
-     * [Description for __construct]
+     * Конструктор класу. Задає початкові значення для path і params
      *
      * @param mixed $path
      * 
@@ -34,7 +35,7 @@ class Template
     }
 
     /**
-     * [Description for setParam]
+     * Добавляє до асоціативного масиву params значення по ключу
      *
      * @param mixed $name
      * @param mixed $value
@@ -48,7 +49,7 @@ class Template
     }
 
     /**
-     * [Description for setParams]
+     * Добавляє до асоціативного масиву params масив значеннь по ключу
      *
      * @param mixed $params
      * 
@@ -62,7 +63,7 @@ class Template
     }
 
     /**
-     * [Description for getHTML]
+     * Повертає HTML-код шаблону сторінки
      *
      * @return [type]
      * 
